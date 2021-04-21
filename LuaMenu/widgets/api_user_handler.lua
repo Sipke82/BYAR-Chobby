@@ -782,29 +782,31 @@ local function GetUserControls(userName, opts)
 						if battleStatus.isSpectator then
 							return
 						end
-						local minbonus = 0
+						local minbonus = 1
 						if isSingleplayer then 
-							minbonus = -99 
+							minbonus = 0 
 						end
 						WG.IntegerSelectorWindow.CreateIntegerSelectorWindow({
-							defaultValue = 0,
+							defaultValue = 1,
 							minValue = minbonus,
-							maxValue = 100,
-							caption = "Add Bonus",
-							labelCaption = "Give "..userName.." an additional % resource bonus. 100% means that player produces double the normal resource amount. 0% is regular resource production. In single player games, a negative bonus will result in that player getting X% less resources",
+							maxValue = 2,
+							step = 0.1,
+							labelCaption = "Resource Production Modifier",
 							width = 360,
+							height = 250,
 							OnAccepted = function(bonusAmount)
+								local bonusPercent = math.floor( 100 * (bonusAmount - 1) )
 								if isSingleplayer then
 									local myUserName = userControls.lobby:GetMyUserName()
 									if userName == myUserName then
 										userControls.lobby:SetBattleStatus({
-											handicap = bonusAmount
+											handicap = bonusPercent
 										})
 									else
 										local userBattleInfo = userControls.lobby:GetUserBattleStatus(userName) or {}
 										if userBattleInfo.aiLib and userBattleInfo.owner == myUserName then
 											userControls.lobby:UpdateAi(userName, {
-												handicap = bonusAmount
+												handicap = bonusPercent
 											})
 										end
 									end
